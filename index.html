@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R6S - Operator Roulette</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>R6S Roulette</h1>
+        
+        <div class="side-toggle">
+            <button class="btn-side active" onclick="setSide('atk', this)">Atak</button>
+            <button class="btn-side" onclick="setSide('def', this)">Obrona</button>
+        </div>
+
+        <div id="operator-display">
+            <img id="op-icon" src="Icons/R6.png" alt="Operator Icon" style="width: 5rem; height: 5rem;">
+            <div class="op-name" id="op-name">GOTOWY?</div>
+        </div>
+
+        <button class="roll-button" onclick="rollOperator()">LOSUJ OPERATORA</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
