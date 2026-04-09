@@ -1,3 +1,4 @@
+// --- Operator data and lookup maps ------------------------------------------------
 const operators = {
     atk: [
         "Striker", "Sledge", "Thatcher", "Ash", "Thermite", "Twitch", "Montagne", "Glaz", "Fuze", "Blitz", "IQ",
@@ -56,26 +57,6 @@ function getOperatorFileName(opName) {
     return operatorFileMap[opName] || opName.toLowerCase();
 }
 
-let currentSide = 'atk';
-let isSpinning = false;
-let operatorHistory = [];
-const volumeLevels = [20, 40, 70];
-let volumeStage = 1;
-
-const rollSound = new Audio('roll.mp3');
-const winSound = new Audio('win.mp3');
-
-const musicFiles = [
-    'music1.mp3',
-    'music2.mp3',
-    'music3.mp3',
-    'music4.mp3',
-    'music5.mp3',
-    'music6.mp3'
-];
-let currentMusic = null;
-let musicIndex = -1;
-
 function getRandomOperator(ops, exclude = []) {
     const filtered = ops.filter(op => !exclude.includes(op));
     if (filtered.length === 0) {
@@ -84,13 +65,35 @@ function getRandomOperator(ops, exclude = []) {
     return filtered[Math.floor(Math.random() * filtered.length)];
 }
 
+// --- Runtime state ------------------------------------------------------------
+let currentSide = 'atk';
+let isSpinning = false;
+let operatorHistory = [];
+const volumeLevels = [20, 40, 70];
+let volumeStage = 1;
+let currentMusic = null;
+let musicIndex = -1;
+let musicMuted = false;
+
+// --- Audio and music control --------------------------------------------------
+const rollSound = new Audio('./roll.mp3');
+const winSound = new Audio('./win.mp3');
+const musicFiles = [
+    './music1.mp3',
+    './music2.mp3',
+    './music3.mp3',
+    './music4.mp3',
+    './music5.mp3',
+    './music6.mp3'
+];
+
 function setVolumeStage(index) {
     volumeStage = index;
     const volumePercent = volumeLevels[volumeStage] / 100;
-    rollSound.volume = Math.min(1, volumePercent * 1.0);
-    winSound.volume = Math.min(1, volumePercent * 1.0);
+    rollSound.volume = Math.min(1, volumePercent);
+    winSound.volume = Math.min(1, volumePercent);
     if (currentMusic) {
-        currentMusic.volume = musicMuted ? 0 : Math.min(1, volumePercent * 1.0);
+        currentMusic.volume = musicMuted ? 0 : Math.min(1, volumePercent);
     }
     const bars = document.querySelector('.volume-bars');
     if (bars) {
@@ -102,8 +105,6 @@ function setVolumeStage(index) {
 function toggleVolumeLevel() {
     setVolumeStage((volumeStage + 1) % volumeLevels.length);
 }
-
-setVolumeStage(volumeStage);
 
 function playNextMusic() {
     if (currentMusic) {
@@ -117,8 +118,6 @@ function playNextMusic() {
     currentMusic.play().catch(e => console.log('Music play blocked'));
 }
 
-let musicMuted = false;
-
 function toggleMusicMute() {
     musicMuted = !musicMuted;
     if (currentMusic) {
@@ -130,6 +129,9 @@ function toggleMusicMute() {
     }
 }
 
+setVolumeStage(volumeStage);
+
+// --- Confetti animation helpers ------------------------------------------------
 const confettiCanvas = document.createElement('canvas');
 confettiCanvas.style.position = 'fixed';
 confettiCanvas.style.top = '0';
@@ -137,7 +139,7 @@ confettiCanvas.style.left = '0';
 confettiCanvas.style.width = '100%';
 confettiCanvas.style.height = '100%';
 confettiCanvas.style.pointerEvents = 'none';
-confettiCanvas.style.zIndex = '999';
+confettiCanvas.style.zIndex = '10000';
 document.body.appendChild(confettiCanvas);
 
 const confettiCtx = confettiCanvas.getContext('2d');
@@ -148,8 +150,6 @@ function resizeConfettiCanvas() {
     confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
 }
-resizeConfettiCanvas();
-window.addEventListener('resize', resizeConfettiCanvas);
 
 function createConfettiPiece(x, y, color) {
     const angle = Math.random() * Math.PI * 2;
@@ -207,7 +207,7 @@ function runConfettiAnimation() {
     });
 }
 
-function confetti({ particleCount = 100, origin = { x: 0.5, y: 0.5 }, colors = ['#ffffff', '#ff007a', '#00d4ff'] } = {}) {
+function renderConfetti({ particleCount = 100, origin = { x: 0.5, y: 0.5 }, colors = ['#ffffff', '#ff007a', '#00d4ff'] } = {}) {
     const startX = origin.x * confettiCanvas.width;
     const startY = origin.y * confettiCanvas.height;
     for (let i = 0; i < particleCount; i++) {
@@ -217,59 +217,55 @@ function confetti({ particleCount = 100, origin = { x: 0.5, y: 0.5 }, colors = [
     runConfettiAnimation();
 }
 
-function setSide(side, btn) {
-    currentSide = side;
-    document.querySelectorAll('.btn-side').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
 function triggerConfetti(flagColor) {
-    if (typeof confetti !== 'function') {
-        return;
-    }
     const colors = [];
     if (flagColor) {
         colors.push(flagColor, '#ffffff', '#000000');
     } else {
         colors.push('#00d4ff', '#ff007a', '#ffffff');
     }
-    confetti({
+    renderConfetti({
         particleCount: 100,
-        spread: 360,
         origin: { x: 0.5, y: 0.5 },
-        colors,
-        zIndex: -1
+        colors
     });
     setTimeout(() => {
-        confetti({
+        renderConfetti({
             particleCount: 50,
-            spread: 360,
             origin: { x: 0.5, y: 0.5 },
-            colors,
-            zIndex: -1
+            colors
         });
     }, 250);
+}
+
+window.addEventListener('resize', resizeConfettiCanvas);
+
+// --- Slot rendering and selection ---------------------------------------------
+function setSide(side, btn) {
+    currentSide = side;
+    document.querySelectorAll('.btn-side').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 }
 
 function updateSlot(slotIndex, opName, same = false) {
     const reel = document.getElementById(`reel-${slotIndex}`);
     const items = reel.querySelectorAll('.reel-item');
     const ops = operators[currentSide];
+
     items.forEach((item, index) => {
         const nameLabel = item.querySelector('.reel-name');
         const iconImg = item.querySelector('.reel-icon');
         let currentOp;
+
         if (same) {
-            if (index === 1) {
-                currentOp = opName;
-            } else {
-                currentOp = getRandomOperator(ops, [opName]);
-            }
+            currentOp = index === 1 ? opName : getRandomOperator(ops, [opName]);
         } else {
             currentOp = getRandomOperator(ops);
         }
+
         const countryCode = opCountryMap[currentOp] || 'un';
-        const fileName = 'Icons/' + getOperatorFileName(currentOp) + '.png';
+        const fileName = './Icons/' + getOperatorFileName(currentOp) + '.png';
+
         nameLabel.innerText = currentOp.toUpperCase();
         nameLabel.classList.add('flag-text');
         nameLabel.style.backgroundImage = `url('https://flagcdn.com/w640/${countryCode}.png')`;
@@ -279,19 +275,24 @@ function updateSlot(slotIndex, opName, same = false) {
     });
 }
 
+// --- Rolling animation logic --------------------------------------------------
 function rollOperator() {
     if (isSpinning) return;
     isSpinning = true;
+
     rollSound.currentTime = 0;
     rollSound.play().catch(e => console.log('Audio play blocked'));
+
     const ops = operators[currentSide];
     const slots = [0, 1, 2];
     const intervals = [];
     const finalOp = getRandomOperator(ops, operatorHistory);
+
     operatorHistory.push(finalOp);
     if (operatorHistory.length > 3) {
         operatorHistory.shift();
     }
+
     slots.forEach(i => {
         const reel = document.getElementById(`reel-${i}`);
         const slotElement = document.getElementById(`slot-${i}`);
@@ -302,6 +303,7 @@ function rollOperator() {
         }, 100);
         intervals.push(timer);
     });
+
     const stopTimes = [3200, 4100, 5000];
     slots.forEach(i => {
         setTimeout(() => {
@@ -313,6 +315,7 @@ function rollOperator() {
             slotElement.classList.remove('spinning');
         }, stopTimes[i]);
     });
+
     setTimeout(() => {
         winSound.currentTime = 0;
         winSound.play().catch(e => console.log('Audio play blocked'));
@@ -327,6 +330,7 @@ function rollOperator() {
     }, 5500);
 }
 
+// --- Fun ad popup logic -------------------------------------------------------
 const funAdImages = [
     'fun-ad1.png',
     'fun-ad2.png',
@@ -339,7 +343,7 @@ const funAdImages = [
     'fun-ad9.png',
     'fun-ad10.png'
 ];
-const funAdPath = 'Icons/ads/';
+const funAdPath = './Icons/ads/';
 let funAdTimer = null;
 
 function getRandomFunAd() {
@@ -352,16 +356,14 @@ function showFunAd() {
     adContainer.style.position = 'fixed';
     adContainer.style.zIndex = '10000';
 
-    // Random size: min 320px width, up to 80% of screen or 800px
     const minWidth = 320;
     const maxWidth = Math.min(window.innerWidth * 0.9, 800);
     const width = minWidth + Math.random() * (maxWidth - minWidth);
-    const height = width * 9 / 16; // maintain 16:9 aspect ratio
+    const height = width * 9 / 16;
 
     adContainer.style.width = width + 'px';
     adContainer.style.height = height + 'px';
 
-    // Random position
     const maxTop = window.innerHeight - height;
     const maxLeft = window.innerWidth - width;
     const top = Math.max(0, Math.random() * maxTop);
@@ -388,7 +390,6 @@ function showFunAd() {
     });
 
     document.body.appendChild(adContainer);
-    // Small delay to allow transition
     setTimeout(() => {
         adContainer.classList.add('visible');
     }, 10);
@@ -400,7 +401,7 @@ function scheduleFunAd() {
     if (funAdTimer) {
         clearTimeout(funAdTimer);
     }
-    const delay = 90000 + Math.random() * 110000; // 90s to 200s
+    const delay = 90000 + Math.random() * 110000;
     funAdTimer = setTimeout(showFunAd, delay);
 }
 
@@ -408,11 +409,11 @@ function startFunAds() {
     scheduleFunAd();
 }
 
+// --- App startup --------------------------------------------------------------
 window.addEventListener('load', () => {
     startFunAds();
     playNextMusic();
 
-    // Add music mute button
     const muteBtn = document.createElement('button');
     muteBtn.id = 'music-mute-btn';
     muteBtn.textContent = '🔊';

@@ -1,3 +1,4 @@
+/* Theme variables --------------------------------------------------------- */
 :root {
     --primary: #00d4ff;
     --secondary: #ff007a;
@@ -6,6 +7,7 @@
     --gold: #ffd700;
 }
 
+/* Page layout ------------------------------------------------------------- */
 body {
     font-family: 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg);
