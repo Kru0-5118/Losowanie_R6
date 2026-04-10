@@ -343,7 +343,7 @@ const funAdImages = [
     'fun-ad9.png',
     'fun-ad10.png'
 ];
-const funAdPath = './Icons/ads/';
+const funAdPath = '/Icons/ads/';
 let funAdTimer = null;
 
 function getRandomFunAd() {
