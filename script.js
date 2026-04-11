@@ -332,18 +332,18 @@ function rollOperator() {
 
 // --- Fun ad popup logic -------------------------------------------------------
 const funAdImages = [
-    'fun-ad1.png',
-    'fun-ad2.png',
-    'fun-ad3.png',
-    'fun-ad4.png',
-    'fun-ad5.png',
-    'fun-ad6.png',
-    'fun-ad7.png',
-    'fun-ad8.png',
-    'fun-ad9.png',
-    'fun-ad10.png'
+    'banner1.png',
+    'banner2.png',
+    'banner3.png',
+    'banner4.png',
+    'banner5.png',
+    'banner6.png',
+    'banner7.png',
+    'banner8.png',
+    'banner9.png',
+    'banner10.png'
 ];
-const funAdPath = '/Icons/ads/';
+const funAdPath = '/Icons/banners/';
 let funAdTimer = null;
 
 function getRandomFunAd() {
