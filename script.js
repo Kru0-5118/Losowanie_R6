@@ -330,8 +330,8 @@ function rollOperator() {
     }, 5500);
 }
 
-// --- Fun ad popup logic -------------------------------------------------------
-const funAdImages = [
+// --- Fun funbanner popup logic -------------------------------------------------------
+const funFunbannerImages = [
     'banner1.png',
     'banner2.png',
     'banner3.png',
@@ -343,16 +343,16 @@ const funAdImages = [
     'banner9.png',
     'banner10.png'
 ];
-const funAdPath = '/Icons/banners/';
-let funAdTimer = null;
+const funFunbannerPath = '/Icons/banners/';
+let funFunbannerTimer = null;
 
-function getRandomFunAd() {
-    return funAdImages[Math.floor(Math.random() * funAdImages.length)];
+function getRandomFunFunbanner() {
+    return funFunbannerImages[Math.floor(Math.random() * funFunbannerImages.length)];
 }
 
-function showFunAd() {
+function showFunFunbanner() {
     const adContainer = document.createElement('div');
-    adContainer.className = 'fun-ad-overlay';
+    adContainer.className = 'fun-funbanner-overlay';
     adContainer.style.position = 'fixed';
     adContainer.style.zIndex = '10000';
 
@@ -373,19 +373,19 @@ function showFunAd() {
     adContainer.style.left = left + 'px';
 
     adContainer.innerHTML = `
-        <div class="fun-ad-popup">
-            <button class="fun-ad-close" type="button" aria-label="Zamknij reklamę">×</button>
-            <div class="fun-ad-image-wrapper">
-                <img class="fun-ad-image" src="" alt="Reklama" />
+        <div class="fun-funbanner-popup">
+            <button class="fun-funbanner-close" type="button" aria-label="Zamknij funbanner">×</button>
+            <div class="fun-funbanner-image-wrapper">
+                <img class="fun-funbanner-image" src="" alt="Funbanner" />
             </div>
         </div>
     `;
 
-    const adName = getRandomFunAd();
-    const adImage = adContainer.querySelector('.fun-ad-image');
-    adImage.src = funAdPath + adName;
+    const adName = getRandomFunFunbanner();
+    const adImage = adContainer.querySelector('.fun-funbanner-image');
+    adImage.src = funFunbannerPath + adName;
 
-    adContainer.querySelector('.fun-ad-close').addEventListener('click', () => {
+    adContainer.querySelector('.fun-funbanner-close').addEventListener('click', () => {
         adContainer.remove();
     });
 
@@ -394,24 +394,24 @@ function showFunAd() {
         adContainer.classList.add('visible');
     }, 10);
 
-    scheduleFunAd();
+    scheduleFunFunbanner();
 }
 
-function scheduleFunAd() {
-    if (funAdTimer) {
-        clearTimeout(funAdTimer);
+function scheduleFunFunbanner() {
+    if (funFunbannerTimer) {
+        clearTimeout(funFunbannerTimer);
     }
     const delay = 90000 + Math.random() * 110000;
-    funAdTimer = setTimeout(showFunAd, delay);
+    funFunbannerTimer = setTimeout(showFunFunbanner, delay);
 }
 
-function startFunAds() {
-    scheduleFunAd();
+function startFunFunbanners() {
+    scheduleFunFunbanner();
 }
 
 // --- App startup --------------------------------------------------------------
 window.addEventListener('load', () => {
-    startFunAds();
+    startFunFunbanners();
     playNextMusic();
 
     const muteBtn = document.createElement('button');
